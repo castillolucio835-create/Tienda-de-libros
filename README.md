@@ -21,3 +21,12 @@ Tienda digital para vender los dos PDFs mediante Mercado Pago Checkout Pro y ent
 Los PDFs están en `private/` y no se sirven mediante `express.static`. El endpoint de descarga vuelve a consultar el pago en Mercado Pago y exige estado `approved`, monto correcto, moneda ARS y referencia del producto.
 
 El webhook es una notificación adicional; la entrega no depende solamente del webhook.
+
+
+## Página de fragmentos y código QR
+
+- La página pública de poesía está disponible en `/poesia`.
+- La tienda muestra un QR que lleva a esa página y se genera automáticamente en `/qr-poesia.svg`.
+- El QR usa `BASE_URL` cuando está configurada; si no, usa el dominio de la solicitud.
+- Al publicar cambios en Render, el QR apunta al dominio público configurado. Si cambia el dominio, revisá `BASE_URL`.
+- La página contiene fragmentos breves de poemas y un enlace de regreso a los libros.

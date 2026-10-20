@@ -1,4 +1,5 @@
 import express from 'express';
+import QRCode from 'qrcode';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -13,6 +14,31 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(ROOT, 'public')));
+
+app.get('/poesia', (req, res) => {
+  res.sendFile(path.join(ROOT, 'public', 'poesia.html'));
+});
+
+app.get('/qr-poesia.svg', async (req, res) => {
+  try {
+    const forwardedProto = String(req.get('x-forwarded-proto') || '').split(',')[0].trim();
+    const protocol = forwardedProto || req.protocol || 'https';
+    const baseUrl = BASE_URL || `${protocol}://${req.get('host')}`;
+    const svg = await QRCode.toString(`${baseUrl}/poesia`, {
+      type: 'svg',
+      errorCorrectionLevel: 'H',
+      margin: 2,
+      width: 420,
+      color: { dark: '#17121d', light: '#ffffff' }
+    });
+    res.set('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(svg);
+  } catch (error) {
+    console.error('qr-poesia:', error);
+    res.status(500).send('No se pudo generar el código QR.');
+  }
+});
 
 const PORT = Number(process.env.PORT || 10000);
 const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
